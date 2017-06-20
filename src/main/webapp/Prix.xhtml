@@ -1,0 +1,325 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:pri="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="./resources/templates/Common.xhtml">
+
+    <ui:param name="titlePage" value="Prix"/>
+    <ui:define name="Contents">
+        <div class="page-title"> 
+            <div class="title-env"> 
+                <h1 class="title">Gestion des prix</h1> 
+                <!--<p class="description">Page d'accueil de GESPHARMA</p>-->
+            </div> 
+            <div class="breadcrumb-env"> 
+                <ol class="breadcrumb bc-1" > 
+                    <li> <a href="#"><i class="fa-home"></i>Home</a> </li> 
+                    <li class="active"> <strong>Gestion des prix</strong> </li> 
+                </ol> 
+            </div> 
+        </div>
+
+        <h:form id="form">
+            <!--<pri:messages autoUpdate="true" showDetail="true" closable="true" />-->
+            <pri:growl id="growl" showDetail="true" autoUpdate="true" life="3500" />
+        </h:form>
+
+        <div class="row">
+            <div class="panel panel-default"> 
+                <div class="panel-heading"> 
+                    <h3 class="panel-title"></h3>                    
+                </div> 
+                <div class="panel-body">                    
+                    <h:form class="form-horizontal" id="affectationForm">
+                         
+                        <div class="form-group">
+                            <h:outputLabel  class="col-sm-2 control-label" value="Produit *"/>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <h:selectOneMenu id="prodId" value="#{prixManagedBean.produit_Prix.produit}" class="form-control right-border form-focus-white" converter="omnifaces.SelectItemsIndexConverter">
+                                        <f:selectItem itemLabel="Selectionner un produit" itemValue="#{null}" noSelectionOption="true"/>
+                                        <f:selectItems var="Prod" value="#{prixManagedBean.produitListe}" itemValue="#{Prod}" itemLabel="#{Prod.lib_prod}"/>
+                                    </h:selectOneMenu>
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-white" type="button" data-toggle="modal" data-target="#EnregProduit" style="height: 31px;">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <h:outputLabel  class="col-sm-2 control-label" value="Prix *"/>                        
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <h:selectOneMenu id="prixId" value="#{prixManagedBean.produit_Prix.prix}" class="form-control right-border form-focus-white" converter="omnifaces.SelectItemsIndexConverter">
+                                        <f:selectItem itemLabel="Selectionner l'intitulé" itemValue="#{null}" noSelectionOption="true"/>
+                                        <f:selectItems var="prx" value="#{prixManagedBean.prixListe}" itemValue="#{prx}" itemLabel="#{prx.lib_prix}"/>
+                                    </h:selectOneMenu>
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-white" type="button" data-toggle="modal" data-target="#EnregPrix" style="height: 31px;">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <h:outputLabel  class="col-sm-2 control-label" value="Prix unitaire *"/>
+                            <div class="col-sm-10">
+                                <h:inputText value="#{prixManagedBean.produit_Prix.prix_unit}" class="form-control" validatorMessage="Prix incorrecte">
+                                    <f:convertNumber integerOnly="true" maxFractionDigits="0"/>
+                                </h:inputText>
+                            </div>                                            
+                        </div>
+                                                
+                        <div class="pull-right">
+                            <h:commandButton  class="btn btn-lg btn-white" value="Annuler" action="#{prixManagedBean.annulerProduit_prix()}">
+                                <pri:ajax update="@form"/>
+                            </h:commandButton>
+                            <h:commandButton  class="btn btn-lg btn-blue" value="Valider" action="#{prixManagedBean.affectationPrix()}">
+                                <pri:ajax update="@form,:form:growl" process="@form"/>
+                            </h:commandButton>                                                              
+                        </div>
+                        
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+
+                        <pri:dataTable id="PPDT" var="PrPr" value="#{prixManagedBean.produitprixListe}"
+                                       widgetVar="prprWV"                                 
+                                       paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                       rowsPerPageTemplate="5,10,15"
+                                       emptyMessage="La liste est vide" reflow="true" rows="10" paginator="true" >                                
+                            <pri:column filterBy="#{PrPr.produit.lib_prod}" headerText="Produit" width="130" filterMatchMode="contains">                               
+                                <center><h:outputText value="#{PrPr.produit.lib_prod}" /></center>
+                            </pri:column>                                                                          
+                            <pri:column filterBy="#{PrPr.prix.lib_prix}" headerText="Intitulé" width="130" filterMatchMode="contains">                               
+                                <center><h:outputText value="#{PrPr.prix.lib_prix}" /></center>
+                            </pri:column>                                                                          
+                            <pri:column filterBy="#{PrPr.prix_unit}" headerText="Prix unitaire" width="80" filterMatchMode="contains">                                
+                                <center><h:outputText value="#{PrPr.prix_unit}" /></center> 
+                            </pri:column>                                                                                 
+                            <pri:column  headerText="Action" width="100">                           
+                                <center><h:commandButton value="Modifier" action="#{prixManagedBean.renvoiProduit_prix(PrPr)}" class="btn btn-turquoise">
+                                        <pri:ajax update="@form"/>
+                                    </h:commandButton></center>
+                            </pri:column>
+                        </pri:dataTable>
+                    </h:form>
+                </div> 
+            </div>
+        </div>
+
+        <div class="modal fade" id="EnregPrix"> 
+            <div class="modal-dialog"> 
+                <div class="modal-content"> 
+                    <div class="modal-header"> 
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+                        <h4 class="modal-title">Libellé</h4> 
+                    </div> 
+                    <div class="modal-body">
+                        <h:form class="form-horizontal" id="prixForm">
+                            <!--<pri:messages autoUpdate="true" showDetail="true" closable="true" />-->
+                            <h:inputHidden value="#{prixManagedBean.prix.id_prix}"/>
+
+                            <div class="col-md-12">                          
+                                <div class="form-group">
+                                    <h:outputText  class="control-label" value="Libellé *"/>
+                                    <h:inputText value="#{prixManagedBean.prix.lib_prix}" class="form-control"/>
+                                </div>
+                            </div>                                             
+
+                            <div class="pull-right"> 
+                                <h:commandButton  class="btn btn-lg btn-white" value="Effacer" action="#{prixManagedBean.annulerPrix()}">
+                                    <pri:ajax update="@form"/>
+                                </h:commandButton>
+                                <h:commandButton  class="btn btn-lg btn-blue"  value="Valider" action="#{prixManagedBean.gestionPrix()}">
+                                    <pri:ajax update=":affectationForm:prixId,:affectationForm:PPDT,@form,:form:growl" process="@form"/>
+                                </h:commandButton>                                                                                                                
+                            </div>                                                                                    
+                            <div class="row"> 
+                                <div class="col-md-12">
+                                    <br/>
+                                    <pri:dataTable var="prx" value="#{prixManagedBean.prixListe}"
+                                                   widgetVar="prxWV"                                 
+                                                   paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                   rowsPerPageTemplate="5,10,15"
+                                                   emptyMessage="La liste est vide" reflow="true" rows="10" paginator="true">
+                                        <pri:column headerText="Intitulé" filterBy="#{prx.lib_prix}" filterMatchMode="contains">
+                                            <h:outputText value="#{prx.lib_prix}" />
+                                        </pri:column>                                                                                                                                                                                                       
+                                        <pri:column headerText="Action" >
+                                            <center><h:commandButton action="#{prixManagedBean.renvoiPrix(prx)}" class="btn btn-turquoise" value="Modifier" >
+                                                    <pri:ajax update="@form"/>
+                                                </h:commandButton></center>
+                                        </pri:column>                           
+                                    </pri:dataTable> 
+                                </div>                                             
+                            </div>  
+                        </h:form>
+                    </div> 
+                    <div class="modal-footer"> 
+                        &nbsp;       
+                    </div>                            
+                </div> 
+            </div> 
+        </div>
+
+        <div class="modal fade" id="EnregProduit"> 
+            <div class="modal-dialog"> 
+                <div class="modal-content"> 
+                    <div class="modal-header"> 
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+                        <h4 class="modal-title">Produit</h4> 
+                    </div> 
+                    <div class="modal-body">
+                        <h:form class="form-horizontal" id="produitForm">
+                            <!--<pri:messages autoUpdate="true" showDetail="true" closable="true" />-->
+                            <h:inputHidden value="#{prixManagedBean.produit.id_prod}"/>
+
+                            <div class="form-group">
+                                <h:outputLabel  class="col-sm-2 control-label" value="Nom *"/>
+                                <div class="col-sm-10">
+                                    <h:inputText value="#{prixManagedBean.produit.lib_prod}" class="form-control" />                             
+                                </div>                                            
+                            </div>   
+                            
+                            <div class="form-group">
+                                <h:outputLabel  class="col-sm-2 control-label" value="Quantité alerte *"/>
+                                <div class="col-sm-10">
+                                    <h:inputText value="#{prixManagedBean.produit.qte_alerte}" class="form-control" validatorMessage="Quantité incorrecte">
+                                        <f:convertNumber integerOnly="true" maxFractionDigits="0"/>
+                                    </h:inputText>
+                                </div>                                            
+                            </div>
+
+                            <div class="form-group">
+                                <h:outputLabel  class="col-sm-2 control-label" value="Categorie Produit *"/>
+                                <div class="col-sm-10">
+                                    <div class="input-group">
+                                        <h:selectOneMenu id="catProdId" value="#{prixManagedBean.produit.categorie}" class="form-control right-border form-focus-white" converter="omnifaces.SelectItemsIndexConverter">
+                                            <f:selectItem itemLabel="Selectionner une catégorie" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems var="catProd" value="#{prixManagedBean.categorieListe}" itemValue="#{catProd}" itemLabel="#{catProd.lib_categ}"/>
+                                        </h:selectOneMenu>
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-white" type="button" data-toggle="modal" data-target="#EnregCategProd" style="height: 31px;">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>                            
+
+                            <div class="pull-right"> 
+                                <h:commandButton  class="btn btn-lg btn-white" value="Effacer" action="#{prixManagedBean.annulerProduit()}">
+                                    <pri:ajax update="@form"/>
+                                </h:commandButton>
+                                <h:commandButton  class="btn btn-lg btn-blue"  value="Valider" action="#{prixManagedBean.gestionProduit()}">
+                                    <pri:ajax update=":affectationForm:prodId,:affectationForm:PPDT,@form,:form:growl" process="@form"/>
+                                </h:commandButton>                                                                                                                
+                            </div>                                                                                    
+                            <div class="row"> 
+                                <div class="col-md-12">
+                                    <br/>
+                                    <pri:dataTable id="prDT" var="pro" value="#{prixManagedBean.produitListe}"
+                                                   widgetVar="proWV"                                 
+                                                   paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                   rowsPerPageTemplate="5,10,15"
+                                                   emptyMessage="La liste est vide" reflow="true" rows="10" paginator="true">
+                                        <pri:column filterBy="#{pro.categorie.lib_categ}" headerText="Catégorie Produit" width="130" filterMatchMode="contains">                               
+                                            <center><h:outputText value="#{pro.categorie.lib_categ}" /></center>
+                                        </pri:column>                                           
+                                        <pri:column headerText="Nom" filterBy="#{pro.lib_prod}" filterMatchMode="contains">
+                                            <h:outputText value="#{pro.lib_prod}" />
+                                        </pri:column>     
+                                        <pri:column  headerText="Qté alerte" width="100">                           
+                                            <center><h:outputText value="#{pro.qte_alerte}" /></center>                                          
+                                        </pri:column>                                        
+                                        <pri:column headerText="Action" >
+                                            <center><h:commandButton action="#{prixManagedBean.renvoieProduit(pro)}" class="btn btn-turquoise" value="Modifier" >
+                                                    <pri:ajax update="@form"/>
+                                                </h:commandButton></center>
+                                        </pri:column>                           
+                                    </pri:dataTable> 
+                                </div>                                             
+                            </div>  
+                        </h:form>
+                    </div> 
+                    <div class="modal-footer"> 
+                        &nbsp;       
+                    </div>                            
+                </div> 
+            </div> 
+        </div>
+
+        <div class="modal fade" id="EnregCategProd"> 
+            <div class="modal-dialog"> 
+                <div class="modal-content"> 
+                    <div class="modal-header"> 
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+                        <h4 class="modal-title">Catégorie Produit</h4> 
+                    </div> 
+                    <div class="modal-body">
+                        <h:form class="form-horizontal" id="categProdForm">
+                            <!--<pri:messages autoUpdate="true" showDetail="true" closable="true" />-->
+                            <h:inputHidden value="#{produitManagedBean.categorie.id_categ}"/>
+
+                            <div class="col-md-12">                          
+                                <div class="form-group">
+                                    <h:outputText  class="control-label" value="Nom *"/>
+                                    <h:inputText value="#{produitManagedBean.categorie.lib_categ}" class="form-control"/>
+                                </div>
+                            </div>                                             
+
+                            <div class="pull-right"> 
+                                <h:commandButton  class="btn btn-lg btn-white" value="Effacer" action="#{produitManagedBean.annulerCategorie()}">
+                                    <pri:ajax update="@form"/>
+                                </h:commandButton>
+                                <h:commandButton  class="btn btn-lg btn-blue"  value="Valider" action="#{produitManagedBean.gestionCategorie()}">
+                                    <pri:ajax update=":produitForm:catProdId,:produitForm:prDT,@form,:form:growl" process="@form"/>
+                                </h:commandButton>                                                                                                                
+                            </div>                                                                                    
+                            <div class="row"> 
+                                <div class="col-md-12">
+                                    <br/>
+                                    <pri:dataTable var="catProd" value="#{produitManagedBean.categorieListe}"
+                                                   widgetVar="cProduitWV"                                 
+                                                   paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                   rowsPerPageTemplate="5,10,15"
+                                                   emptyMessage="La liste est vide" reflow="true" rows="10" paginator="true">
+                                        <pri:column headerText="Nom" filterBy="#{catProd.lib_categ}" filterMatchMode="contains">
+                                            <h:outputText value="#{catProd.lib_categ}" />
+                                        </pri:column>                                                                                                                                                                                                       
+                                        <pri:column headerText="Action" >
+                                            <center><h:commandButton action="#{produitManagedBean.renvoiCategorie(catProd)}" class="btn btn-turquoise" value="Modifier" >
+                                                    <pri:ajax update="@form"/>
+                                                </h:commandButton></center>
+                                        </pri:column>                           
+                                    </pri:dataTable> 
+                                </div>                                             
+                            </div>  
+                        </h:form>
+                    </div> 
+                    <div class="modal-footer"> 
+                        &nbsp;       
+                    </div>                            
+                </div> 
+            </div> 
+        </div>
+        
+                        
+    </ui:define>
+
+</ui:composition>                        
+
+                        
+
+        

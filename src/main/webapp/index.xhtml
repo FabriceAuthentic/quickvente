@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:pri="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+    <h:head>
+        <meta charset="utf-8"></meta>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"></meta>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />        
+        <title>Bienvenue - Authentification</title> 
+        <link rel="stylesheet" href="resources/fonts.googleapis.com/css1af1.css?family=Arimo:400,700,400italic" id="style-resource-1"/>
+        <link rel="stylesheet" href="resources/css/fonts/linecons/css/linecons.css" id="style-resource-2"/> 
+        <link rel="stylesheet" href="resources/css/fonts/fontawesome/css/font-awesome.min.css" id="style-resource-3"/> 
+        <link rel="stylesheet" href="resources/css/bootstrap.css" id="style-resource-4"/> 
+        <link rel="stylesheet" href="resources/css/xenon-core.css" id="style-resource-5"/> 
+        <link rel="stylesheet" href="resources/css/xenon-forms.css" id="style-resource-6"/> 
+        <link rel="stylesheet" href="resources/css/xenon-components.css" id="style-resource-7"/> 
+        <link rel="stylesheet" href="resources/css/xenon-skins.css" id="style-resource-8"/> 
+        <link rel="stylesheet" href="resources/css/custom.css" id="style-resource-9"/> 
+        <script src="resources/js/jquery-1.11.1.min.js"></script>
+    </h:head>
+    <h:body class="page-body login-page login-light">
+        <div class="login-container">
+            <div class="row"> 
+                <div class="col-sm-6"> 
+                    <script type="text/javascript">
+                        jQuery(document).ready(function ($)
+                        {
+                            setTimeout(function () {
+                                $(".fade-in-effect").addClass('in');
+                            }, 1);
+                        });
+                    </script>
+                    <div class="errors-container">
+                        <h:form>
+                            <pri:messages autoUpdate="true" showDetail="true" closable="true"/>
+                        </h:form>
+                    </div> 
+                    <h:form class="login-form fade-in-effect" id="connxion">
+                        <div class="login-header">
+                            <h2 class="success"><strong>QuickVente</strong></h2>
+                            <p>Bienvenue, connectez-vous pour acceder à votre compte</p> 
+                        </div> 
+                        <div class="form-group"> 
+                            <h:inputText class="form-control input-lg"  p:placeholder="Utilisateur..." value="#{connexionManagedBean.userConnexion.login}"/>
+                        </div> 
+                        <div class="form-group">  
+                            <h:inputSecret class="form-control input-lg"  p:placeholder="Mot de passe..." value="#{connexionManagedBean.userConnexion.motDePasse}"/> 
+                        </div> 
+                        <div class="form-group">
+                            <pri:commandButton value="Connexion" action="#{connexionManagedBean.connexionUser()}" class="btn btn-success btn-block text-center"/>                            
+                        </div> 
+                    </h:form>
+                    <h:form class="form-horizontal" id="formModalMdp">
+                        <div class="modal fade" id="EnregMdp"> 
+                            <div class="modal-dialog"> 
+                                <div class="modal-content"> 
+                                    <div class="modal-header"> 
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+                                        <h4 class="modal-title"><p>Enregistrement du mot de passe</p></h4> 
+                                    </div> 
+                                    <div class="modal-body">
+                                        <pri:messages autoUpdate="true" showDetail="true" closable="true"/> 
+                                        <div class="col-md-12">                          
+                                            <div class="form-group">
+                                                <h:inputSecret value="#{connexionManagedBean.newMdp}" class="form-control" p:placeholder="Mot de passe..."/>
+                                            </div>                                           
+                                        </div>                                                                                    
+                                        <div class="col-md-12">                          
+                                            <div class="form-group">
+                                                <h:inputSecret value="#{connexionManagedBean.comfMdp}" class="form-control" p:placeholder="Comfirmer mot de passe..."/>
+                                            </div>                                          
+                                        </div>                                                                                    
+                                    </div> 
+                                    <div class="modal-footer"> 
+                                        <pri:commandButton  class="btn btn-info" value="Valider" action="#{connexionManagedBean.modifMdp()}" /> 
+                                    </div>                            
+                                </div> 
+                            </div> 
+                        </div>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+        <script src="resources/js/bootstrap.min.js" id="script-resource-1"></script>
+        <script src="resources/js/TweenMax.min.js" id="script-resource-2"></script> 
+        <script src="resources/js/resizeable.js" id="script-resource-3"></script> 
+        <script src="resources/js/joinable.js" id="script-resource-4"></script> 
+        <script src="resources/js/xenon-api.js" id="script-resource-5"></script> 
+        <script src="resources/js/xenon-toggles.js" id="script-resource-6"></script> 
+        <!-- JavaScripts initializations and stuff --> 
+        <script src="resources/js/xenon-custom.js" id="script-resource-7"></script> 
+    </h:body>
+</html>                                                
+

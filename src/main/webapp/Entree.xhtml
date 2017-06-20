@@ -1,0 +1,209 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:pri="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="./resources/templates/Common.xhtml"
+                xmlns:cc="http://xmlns.jcp.org/jsf/composite">
+
+    <ui:param name="titlePage" value="Entree"/>
+    <ui:define name="Contents">
+        <div class="page-title"> 
+            <div class="title-env"> 
+                <h1 class="title">Gestion des entrées en stock</h1> 
+                <!--<p class="description">Page d'accueil de GESPHARMA</p>-->
+            </div> 
+            <div class="breadcrumb-env"> 
+                <ol class="breadcrumb bc-1" > 
+                    <li> <a href="#"><i class="fa-home"></i>Home</a> </li> 
+                    <li class="active"> <strong>Gestion des entées en stock</strong> </li> 
+                </ol> 
+            </div> 
+        </div>
+
+        <h:form id="form">
+            <!--<pri:messages autoUpdate="true" showDetail="true" closable="true" />-->
+            <pri:growl id="growl" showDetail="true" autoUpdate="true" life="3500" />
+        </h:form>
+
+        <div class="row">
+            <div class="panel panel-default"> 
+                <div class="panel-heading"> 
+                    <h3 class="panel-title"></h3>                    
+                </div> 
+                <div class="panel-body">                    
+                    <h:form class="form-horizontal" id="entreeForm">     
+                        <div class="form-group">
+                            <h:outputLabel  class="col-sm-2 control-label" value="Bon Livraison *"/>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <h:selectOneMenu id="livId" value="#{entreeManagedBean.livraison}" class="form-control right-border form-focus-white" converter="omnifaces.SelectItemsIndexConverter">
+                                        <f:selectItem itemLabel="Selectionner le bon de livraison" itemValue="#{null}" noSelectionOption="true"/>
+                                        <f:selectItems var="liv" value="#{entreeManagedBean.livraisonListe}" itemValue="#{liv}" itemLabel="#{liv.ref_liv}"/>
+                                    </h:selectOneMenu>
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-white" type="button" data-toggle="modal" data-target="#EnregLiv" style="height: 31px;">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <pri:dataTable id="checkboxProdDT" var="Prod" value="#{entreeManagedBean.produitListe}"
+                                       selection="#{entreeManagedBean.produitListeSelect}" 
+                                       rowKey="#{Prod.id_prod}" style="margin-bottom:0"
+                                        rows="5"
+                                        emptyMessage="La liste est vide"
+                                        paginator="true"
+                                        paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                        rowsPerPageTemplate="5,10,15">
+                                <f:facet name="header">
+                                    Liste des produits
+                                </f:facet>
+                                <pri:column selectionMode="multiple" style="width:35px;text-align:center"/>
+                                <pri:column filterBy="#{Prod.lib_prod}" headerText="Produit">
+                                    <h:outputText value="#{Prod.lib_prod}" />
+                                </pri:column>
+                                <pri:column filterBy="#{Prod.categorie.lib_categ}" headerText="Type">
+                                    <h:outputText value="#{Prod.categorie.lib_categ}" />
+                                </pri:column>
+                                <pri:column headerText="Quantité">
+                                    <h:outputText value="#{entreeManagedBean.qteDispo(Prod)}" />
+                                </pri:column>                                
+                                <f:facet name="footer">
+                                    <pri:commandButton update=":entreeForm:stockDT,:entreeForm:checkboxProdDT,:form:growl" icon="fa fa-plus" value="Ajouter" action="#{entreeManagedBean.ajoutProduit()}" />
+                                </f:facet>
+                            </pri:dataTable>
+                            <br/>
+                            <hr style="background-color:#ff6264; height: 1px;"/>
+                            <br/>
+                            <br/>
+                            <pri:dataTable id="stockDT" var="stck" value="#{entreeManagedBean.stockListe}" editable="true" editMode="cell"
+                                           emptyMessage="La liste est vide"
+                                           widgetVar="stockWV">
+                                <f:facet name="header">
+                                    Produit à mettre en stock
+                                </f:facet>
+                                <pri:ajax event="cellEdit" listener="#{entreeManagedBean.onCellEdit}"/>
+                                <pri:column headerText="Produit">
+                                    <h:outputText value="#{stck.produit.lib_prod}" />                                       
+                                </pri:column>
+                                <pri:column headerText="Catégorie">
+                                    <h:outputText value="#{stck.produit.categorie.lib_categ}" />                                       
+                                </pri:column>
+
+                                <pri:column headerText="Quantité à mettre en stock">
+                                    <pri:cellEditor>
+                                        <f:facet name="output"><center><h:outputText value="#{stck.qte_stock}" /></center></f:facet>
+                                        <f:facet name="input"><pri:inputNumber decimalPlaces="0" thousandSeparator=" " emptyValue="0" value="#{stck.qte_stock}" style="width:96%"/></f:facet>
+                                    </pri:cellEditor>
+                                </pri:column>
+                                <pri:column headerText="Action">
+                                    <center><h:commandButton value="Supprimer" class="btn btn-pink" action="#{entreeManagedBean.supprimerStockListe(stck)}">
+                                            <pri:ajax update=":entreeForm:stockDT"/>
+                                        </h:commandButton> </center>                                      
+                                </pri:column>
+                            </pri:dataTable>
+                            <br/>
+                            <br/>
+                        <div class="pull-right">
+                            <h:commandButton  class="btn btn-lg btn-white" value="Annuler" action="#{entreeManagedBean.annulerListe()}">
+                                <pri:ajax update="@form"/>
+                            </h:commandButton>
+                            <h:commandButton  class="btn btn-lg btn-blue" value="Valider" action="#{entreeManagedBean.gestionEntreeStock()}">
+                                <pri:ajax update="@form,:form:growl" process="@form"/>
+                            </h:commandButton>                                                              
+                        </div>
+                    </h:form>
+                </div> 
+            </div>
+        </div>
+        
+        <div class="modal fade" id="EnregLiv"> 
+            <div class="modal-dialog"> 
+                <div class="modal-content"> 
+                    <div class="modal-header"> 
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+                        <h4 class="modal-title">Bon Livraison</h4> 
+                    </div> 
+                    <div class="modal-body">
+                        <h:form class="form-horizontal" id="livForm">
+                            <!--<pri:messages autoUpdate="true" showDetail="true" closable="true" />-->
+                            <h:inputHidden value="#{entreeManagedBean.livraison.id_liv}"/>
+                            
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <h:outputText  class="control-label" value="Date livraison *"/>&nbsp;
+                                    <pri:calendar id="restricted" value="#{entreeManagedBean.livraison.date_liv}" mindate="-6d" maxdate="+0d"/>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <h:outputLabel  class="col-sm-2 control-label" value="Référence livraison *"/>
+                                <div class="col-sm-10">
+                                    <h:inputText value="#{entreeManagedBean.livraison.ref_liv}" class="form-control" />                             
+                                </div>                                            
+                            </div>                                            
+                                             
+                            <div class="pull-right"> 
+                                <h:commandButton  class="btn btn-lg btn-white" value="Effacer" action="#{entreeManagedBean.annulerLivraison()}">
+                                    <pri:ajax update="@form"/>
+                                </h:commandButton>
+                                <h:commandButton  class="btn btn-lg btn-blue"  value="Valider" action="#{entreeManagedBean.gestionLivraison()}">
+                                    <pri:ajax update=":entreeForm:livId,:entreeForm:stockDT,@form,:form:growl" process="@form"/>
+                                </h:commandButton>                                                                                                                
+                            </div>
+                            
+                            <div class="row"> 
+                                <div class="col-md-12">
+                                    <br/>
+                                    <pri:dataTable id="livDT" var="livT" value="#{entreeManagedBean.livraisonListe}"
+                                                   widgetVar="livWV"                                 
+                                                   paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                   rowsPerPageTemplate="5,10,15"
+                                                   emptyMessage="La liste est vide" reflow="true" rows="10" paginator="true">
+                                        <pri:column headerText="Nom" filterBy="#{livT.ref_liv}" filterMatchMode="contains">
+                                            <h:outputText value="#{livT.ref_liv}" />
+                                        </pri:column>                                                                                                                                                                                                       
+                                        <pri:column id="Date"
+                                            headerText="Date" 
+                                            filterFunction="#{entreeManagedBean.filterByDate}"
+                                            filterBy="#{livT.date_liv}"
+                                            width="200">
+                                            <f:facet name="filter">
+                                                <pri:calendar id="da">
+                                                    <pri:ajax event="dateSelect" oncomplete="PF('livWV').filter()" update="livDT" />
+                                                    <pri:ajax event="change" oncomplete="PF('livWV').filter()" update="livDT"/>
+                                                </pri:calendar>
+                                            </f:facet>
+                                            <h:outputText value="#{livT.date_liv}" >
+                                                <f:convertDateTime dateStyle="full" locale="fr_FR"/>
+                                            </h:outputText>    
+                                        </pri:column>
+                                        <pri:column headerText="Action" >
+                                            <center><h:commandButton action="#{entreeManagedBean.renvoieLivraison(livT)}" class="btn btn-turquoise" value="Modifier" >
+                                                    <pri:ajax update="@form"/>
+                                                </h:commandButton></center>
+                                        </pri:column>                           
+                                    </pri:dataTable> 
+                                </div>                                             
+                            </div>  
+                        </h:form>
+                    </div> 
+                    <div class="modal-footer"> 
+                        &nbsp;       
+                    </div>                            
+                </div> 
+            </div> 
+        </div>
+    </ui:define>
+
+</ui:composition>                        
+
+                        
+
+        

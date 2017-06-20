@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:pri="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="./resources/templates/Common.xhtml">
+
+    <ui:param name="titlePage" value="Client"/>
+    <ui:define name="Contents">
+        <div class="page-title"> 
+            <div class="title-env"> 
+                <h1 class="title">Gestion des Clients</h1> 
+                <!--<p class="description">Page d'accueil de GESPHARMA</p>-->
+            </div> 
+            <div class="breadcrumb-env"> 
+                <ol class="breadcrumb bc-1" > 
+                    <li> <a href="#"><i class="fa-home"></i>Home</a> </li> 
+                    <li class="active"> <strong>Gestion des clients</strong> </li> 
+                </ol> 
+            </div> 
+        </div>
+
+        <h:form id="form">
+            <!--<pri:messages autoUpdate="true" showDetail="true" closable="true" />-->
+            <pri:growl id="growl" showDetail="true" autoUpdate="true" life="3500" />
+        </h:form>
+
+        <div class="row">
+            <div class="panel panel-default"> 
+                <div class="panel-heading"> 
+                    <h3 class="panel-title"></h3>                    
+                </div> 
+                <div class="panel-body">                    
+                    <h:form class="form-horizontal" id="clientForm">
+                        <h:inputHidden value="#{clientManagedBean.client.id_cli}"/>
+                        
+                        <div class="form-group">
+                            <h:outputLabel  class="col-sm-2 control-label" value="Nom *"/>
+                            <div class="col-sm-10">
+                                <h:inputText value="#{clientManagedBean.client.nom_cli}" class="form-control" />                             
+                            </div>                                            
+                        </div>
+                        
+                        <div class="form-group">
+                            <h:outputLabel  class="col-sm-2 control-label" value="Adresse"/>
+                            <div class="col-sm-10">
+                                <h:inputText value="#{clientManagedBean.client.adresse_cli}" class="form-control" />
+                            </div>                                            
+                        </div>
+                        
+                        <div class="form-group">
+                            <h:outputLabel  class="col-sm-2 control-label" value="Contact "/>
+                            <div class="col-sm-10">
+                                <h:inputText value="#{clientManagedBean.client.tel_cli}" class="form-control" />                             
+                            </div>                                            
+                        </div>
+                        
+                        <div class="pull-right">
+                            <h:commandButton  class="btn btn-lg btn-white" value="Annuler" action="#{clientManagedBean.annulerClient()}">
+                                <pri:ajax update="@form"/>
+                            </h:commandButton>
+                            <h:commandButton  class="btn btn-lg btn-blue" value="Valider" action="#{clientManagedBean.gestionClient()}">
+                                <pri:ajax update="@form,:form:growl" process="@form"/>
+                            </h:commandButton>                                                              
+                        </div>
+                        
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+
+                        <pri:dataTable id="cliDT" var="cli" value="#{clientManagedBean.clientListe}"
+                                       widgetVar="cliWV"                                 
+                                       paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+                                       rowsPerPageTemplate="5,10,15"
+                                       emptyMessage="La liste est vide" reflow="true" rows="10" paginator="true" >
+                            <f:facet name="{Exporters}">
+                                <h:commandLink>
+                                    <pri:graphicImage name="images/excel.png" width="24"/>
+                                    <pri:dataExporter type="xls" target="cliDT" fileName="client" />
+                                </h:commandLink>
+                                <h:commandLink>
+                                    <pri:graphicImage name="images/pdf.png" width="24"/>
+                                    <pri:dataExporter type="pdf" target="cliDT" fileName="client"/>
+                                </h:commandLink>
+                            </f:facet>
+                            <pri:column filterBy="#{cli.nom_cli}" headerText="Nom" width="130" filterMatchMode="contains">                               
+                                <center><h:outputText value="#{cli.nom_cli}" /></center>
+                            </pri:column>                                                                          
+                            <pri:column filterBy="#{cli.adresse_cli}" headerText="Adresse" width="140" filterMatchMode="contains">                               
+                                <center><h:outputText value="#{cli.adresse_cli}" /></center>
+                            </pri:column>                                                                          
+                            <pri:column filterBy="#{cli.tel_cli}" headerText="Contact" width="120" filterMatchMode="contains">                                
+                                <center><h:outputText value="#{cli.tel_cli}" /></center> 
+                            </pri:column>                                                                                 
+                            <pri:column  headerText="Action" width="100">                           
+                                <center><h:commandButton value="Modifier" action="#{clientManagedBean.renvoiClient(cli)}" class="btn btn-turquoise">
+                                        <pri:ajax update="@form"/>
+                                    </h:commandButton></center>
+                            </pri:column>
+                        </pri:dataTable>
+                    </h:form>
+                </div> 
+            </div>
+        </div>
+
+                        
+    </ui:define>
+
+</ui:composition>                        
+
+                        
+
+        

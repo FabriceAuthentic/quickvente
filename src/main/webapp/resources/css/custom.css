@@ -1,0 +1,17 @@
+/**
+ *
+ * Apply your custom CSS here
+ *
+*/
+
+body {	
+}
+
+a {
+}
+
+.selection tr{
+    float: left;
+    width: 33%;
+    padding-bottom: 10px;
+}

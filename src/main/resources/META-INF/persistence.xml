@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="QuickVente_Unit" transaction-type="JTA">
+    <jta-data-source>jdbc/quickvente</jta-data-source>
+    <class>com.fabrice.journal.entities.Journal</class>
+    <class>com.fabrice.quickvente.entities.Categorie</class>
+    <class>com.fabrice.quickvente.entities.Client</class>
+    <class>com.fabrice.quickvente.entities.Ligne_Vente</class>
+    <class>com.fabrice.quickvente.entities.Livraison</class>
+    <class>com.fabrice.quickvente.entities.Prix</class>
+    <class>com.fabrice.quickvente.entities.Produit</class>
+    <class>com.fabrice.quickvente.entities.Produit_Prix</class>
+    <class>com.fabrice.quickvente.entities.Vente</class>
+    <class>com.fabrice.webapp.core.entities.Variable</class>
+    <class>com.fabrice.webapp.fabrice.securite.entities.Droit</class>
+    <class>com.fabrice.webapp.fabrice.securite.entities.Profil</class>
+    <class>com.fabrice.webapp.fabrice.securite.entities.Utilisateur</class>
+    <class>com.fabrice.quickvente.entities.Inventaire</class>
+    <class>com.fabrice.quickvente.entities.Stock</class>
+    <class>com.fabrice.quickvente.entities.Caissier</class>
+    <class>com.fabrice.webapp.fabrice.securite.entities.Poste</class>
+    <class>com.fabrice.webapp.fabrice.securite.entities.Posseder</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <properties>
+    </properties>
+  </persistence-unit>
+</persistence>

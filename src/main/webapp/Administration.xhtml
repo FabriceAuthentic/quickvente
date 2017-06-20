@@ -1,0 +1,564 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:pri="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="./resources/templates/Common.xhtml">
+
+    <ui:param name="titlePage" value="Administration"/>
+    <ui:define name="Contents">
+        <div class="page-title"> 
+            <div class="title-env"> 
+                <h1 class="title">Administration</h1> 
+                <!--<p class="description">Page d'accueil de GESPHARMA</p>-->
+            </div> 
+            <div class="breadcrumb-env"> 
+                <ol class="breadcrumb bc-1" > 
+                    <li> <a href="#"><i class="fa-home"></i>Home</a> </li> 
+                    <li class="active"> <strong>Administration</strong> </li> 
+                </ol> 
+            </div> 
+        </div>
+
+        <h:form id="form">
+            <!--<pri:messages autoUpdate="true" showDetail="true" closable="true" />-->
+            <pri:growl id="growl" showDetail="true" autoUpdate="true" life="3500" />
+
+        </h:form>
+
+        <div class="row">
+            <div class="panel panel-default panel-tabs">
+                <div class="panel-heading"> 
+                    <!--<h3 class="panel-title">Médicament</h3>--> 
+                    <div class="panel-options"> 
+                        <ul class="nav nav-tabs"> 
+                            <li> <a href="#Import" data-toggle="tab">Importer</a> </li>                             
+                            <li class="active"> <a href="#EnregUser" data-toggle="tab">Utilisateur</a> </li>                             
+                            <li> <a href="#EnregDroit" data-toggle="tab">Profil</a> </li> 
+                            <li> <a href="#AttribDroit" data-toggle="tab">Attribution de profil</a> </li> 
+                            <li> <a href="#journalTab" data-toggle="tab">Journal</a> </li> 
+                        </ul> 
+                    </div> 
+                </div> 
+                <div class="panel-body"> 
+                    <div class="tab-content"> 
+                        <div class="tab-pane" id="Import"> 
+                            <h:form class="form-horizontal" id="importerForm">
+                                <pri:fileUpload id="fileRap" fileLimitMessage="Vous ne pouvez que choisir qu'un seul fichier svp !"
+                                                        invalidFileMessage="Fichier invalide, choisissez un fichier au format xlsx svp !" 
+                                                        mode="advanced" uploadLabel="Charger" cancelLabel="Annuler" label="Choisir fichier"
+                                                        dragDropSupport="false" fileLimit="1" allowTypes="/(\.|\/)(xlsx)$/"  update=":form:growl"
+                                                        fileUploadListener="#{administrationManagedBean.handleFileUpload}"/>
+                                
+                                <br/>
+                                <br/>
+                                <div class="pull-right">
+                                    <h:commandButton  class="btn btn-lg btn-white" value="Annuler" action="#{administrationManagedBean.annulerImporter()}">
+                                        <pri:ajax update="@form"/>
+                                    </h:commandButton>
+                                    <h:commandButton  class="btn btn-lg btn-info" value="Valider" action="#{administrationManagedBean.importer()}">
+                                        <pri:ajax update="@form,:utilisateurForm,:attribDroitForm:affectationDT,:searchUserForm,:journalForm,:attribDroitForm:userProfilId,:form:growl" process="@form"/>
+                                    </h:commandButton>                                                              
+                                </div>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <pri:dataTable var="cp2" value="#{administrationManagedBean.utilisateurListe}" 
+                                               widgetVar="utilisateur2WV"                                 
+                                               paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                               rowsPerPageTemplate="5,10,15"
+                                               emptyMessage="La liste d'utilisateur est vide" reflow="true" rows="10" paginator="true" >                                
+                                    <pri:column filterBy="#{cp2.poste.libPoste}" headerText="Poste" filterMatchMode="exact">
+                                        <f:facet name="filter">
+                                            <h:selectOneMenu onchange="PF('utilisateur2WV').filter()" >
+                                                <f:selectItem itemLabel="Tous" itemValue="#{null}" noSelectionOption="true" />
+                                                <f:selectItems var="post2" value="#{administrationManagedBean.posteListe}" itemValue="#{post2.libPoste}" itemLabel="#{post2.libPoste}"/>
+                                            </h:selectOneMenu>
+                                        </f:facet>
+                                        <h:outputText value="#{cp2.poste.libPoste}" />
+                                    </pri:column>                                                                          
+                                    <pri:column filterBy="#{cp2.nom} #{cp2.prenom}" headerText="Nom prénom" filterMatchMode="contains">                       
+                                        <h:outputText value="#{cp2.nom} #{cp2.prenom}" />
+                                    </pri:column>                          
+                                    <pri:column filterBy="#{cp2.sexe}"  headerText="Sexe" filterMatchMode="contains">                           
+                                        <center><h:outputText value="#{cp2.sexe}" /></center>                                          
+                                    </pri:column>  
+                                    <pri:column filterBy="#{cp2.login}"  headerText="Nom d'utilisateur" filterMatchMode="contains">                           
+                                        <center><h:outputText value="#{cp2.login}" /></center>                                          
+                                    </pri:column>  
+                                    <pri:column filterBy="#{cp2.adresseEmail}"  headerText="Email" filterMatchMode="contains">                           
+                                        <center><h:outputText value="#{cp2.adresseEmail}" /></center>                                          
+                                    </pri:column>  
+                                    <pri:column  headerText="Actif" >                                       
+                                        <center><h:outputText value="#{administrationManagedBean.actifLabel(cp2.actif)}"/></center>                                          
+                                    </pri:column>               
+                                </pri:dataTable>
+                            </h:form>
+                        </div>
+                        
+                        <div class="tab-pane active" id="EnregUser"> 
+                            <h:form class="form-horizontal" id="utilisateurForm">
+                                <h:inputHidden value="#{administrationManagedBean.utilisateur.id}"/>
+                                <br/>
+                                <div class="row">
+                                    <div class="form-group">
+                                        <h:outputLabel  class="col-sm-2 control-label" value="Poste *"/>
+                                        <div class="col-sm-10">
+                                            <div class="input-group">
+                                                <h:selectOneMenu id="posteUserId" value="#{administrationManagedBean.utilisateur.poste}" class="form-control right-border form-focus-white" converter="omnifaces.SelectItemsIndexConverter">
+                                                    <f:selectItem itemLabel="Selectionner un poste" itemValue="#{null}" noSelectionOption="true"/>
+                                                    <f:selectItems var="post1" value="#{administrationManagedBean.posteListe}" itemValue="#{post1}" itemLabel="#{post1.libPoste}"/>
+                                                </h:selectOneMenu>
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-white" type="button" data-toggle="modal" data-target="#EnregPoste" style="height: 31px;">
+                                                        <i class="fa fa-search"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <h:outputLabel  class="col-sm-2 control-label" value="Nom *"/>
+                                        <div class="col-sm-10">
+                                            <h:inputText  value="#{administrationManagedBean.utilisateur.nom}" class="form-control"/>
+                                        </div>                                            
+                                    </div>
+
+                                    <div class="form-group">
+                                        <h:outputLabel  class="col-sm-2 control-label" value="Prenom *"/>
+                                        <div class="col-sm-10">
+                                            <h:inputText  value="#{administrationManagedBean.utilisateur.prenom}" class="form-control"/>
+                                        </div>                                            
+                                    </div>
+
+                                    <div class="form-group">
+                                        <h:outputLabel  class="col-sm-2 control-label" value="Sexe"/>
+                                        <div class="col-sm-10">
+                                            <h:selectOneMenu value="#{administrationManagedBean.utilisateur.sexe}" class="form-control">
+                                                <f:selectItem itemValue="M" itemLabel="M" />
+                                                <f:selectItem itemValue="F" itemLabel="F" />
+                                            </h:selectOneMenu>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <h:outputLabel  class="col-sm-2 control-label" value="Contact"/>
+                                        <div class="col-sm-10">
+                                            <h:inputText value="#{administrationManagedBean.utilisateur.contact}" class="form-control" >
+                                                <f:convertNumber integerOnly="true" maxFractionDigits="0"/>
+                                            </h:inputText>
+                                        </div>                                            
+                                    </div>
+
+                                    <div class="form-group">
+                                        <h:outputLabel  class="col-sm-2 control-label" value="Email"/>
+                                        <div class="col-sm-10">
+                                            <h:inputText value="#{administrationManagedBean.utilisateur.adresseEmail}"  class="form-control"/>
+                                        </div>                                            
+                                    </div>    
+                                    <hr/>
+                                    <div class="form-group">
+                                        <h:outputLabel  class="col-sm-2 control-label" value="Utilisateur *"/>
+                                        <div class="col-sm-10">
+                                            <h:inputText value="#{administrationManagedBean.utilisateur.login}"  class="form-control" disabled="#{administrationManagedBean.disAdmin}"/>                                                   
+                                        </div>                                            
+                                    </div>
+
+                                    <div class="form-group">
+                                        <h:outputLabel  class="col-sm-2 control-label" value="Actif *"/>
+                                        <div class="col-sm-10">
+                                            <h:selectBooleanCheckbox value="#{administrationManagedBean.utilisateur.actif}" disabled="#{administrationManagedBean.disAdmin}"/>
+                                        </div>                                            
+                                    </div>
+
+                                </div>
+                                <div class="pull-right">
+                                    <h:commandButton  class="btn btn-lg btn-white" value="Annuler" action="#{administrationManagedBean.annulerUtilisateur()}">
+                                        <pri:ajax update="@form"/>
+                                    </h:commandButton>
+                                    <h:commandButton  class="btn btn-lg btn-info" value="Valider" action="#{administrationManagedBean.ajouterUtilisateur()}">
+                                        <pri:ajax update="@form,:attribDroitForm:affectationDT,:searchUserForm,:journalForm,:attribDroitForm:userProfilId,:form:growl" process="@form"/>
+                                    </h:commandButton>                                                              
+                                </div>
+
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+
+                                <pri:dataTable id="utilisateurDT" var="cp" value="#{administrationManagedBean.utilisateurListe}" 
+                                               widgetVar="utilisateurWV"                                 
+                                               paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                               rowsPerPageTemplate="5,10,15"
+                                               emptyMessage="La liste d'utilisateur est vide" reflow="true" rows="10" paginator="true" >                                
+                                    <pri:column filterBy="#{cp.poste.libPoste}" headerText="Poste" filterMatchMode="exact">
+                                        <f:facet name="filter">
+                                            <h:selectOneMenu onchange="PF('utilisateurWV').filter()" >
+                                                <f:selectItem itemLabel="Tous" itemValue="#{null}" noSelectionOption="true" />
+                                                <f:selectItems var="post" value="#{administrationManagedBean.posteListe}" itemValue="#{post.libPoste}" itemLabel="#{post.libPoste}"/>
+                                            </h:selectOneMenu>
+                                        </f:facet>
+                                        <h:outputText value="#{cp.poste.libPoste}" />
+                                    </pri:column>                                                                          
+                                    <pri:column filterBy="#{cp.nom} #{cp.prenom}" headerText="Nom prénom" filterMatchMode="contains">                       
+                                        <h:outputText value="#{cp.nom} #{cp.prenom}" />
+                                    </pri:column>                          
+                                    <pri:column filterBy="#{cp.sexe}"  headerText="Sexe" filterMatchMode="contains">                           
+                                        <center><h:outputText value="#{cp.sexe}" /></center>                                          
+                                    </pri:column>  
+                                    <pri:column filterBy="#{cp.login}"  headerText="Nom d'utilisateur" filterMatchMode="contains">                           
+                                        <center><h:outputText value="#{cp.login}" /></center>                                          
+                                    </pri:column>  
+                                    <pri:column filterBy="#{cp.adresseEmail}"  headerText="Email" filterMatchMode="contains">                           
+                                        <center><h:outputText value="#{cp.adresseEmail}" /></center>                                          
+                                    </pri:column>  
+                                    <pri:column  headerText="Actif" >                                       
+                                        <center><h:outputText value="#{administrationManagedBean.actifLabel(cp.actif)}"/></center>                                          
+                                    </pri:column>  
+                                    <pri:column  headerText="Action">                           
+                                        <center><h:commandButton value="Modifier" action="#{administrationManagedBean.renvoieUtilisateur(cp)}" class="btn btn-turquoise">
+                                                <pri:ajax update="@form"/>
+                                            </h:commandButton></center>
+                                    </pri:column>
+                                    <pri:column >                           
+                                        <center><pri:commandButton value="Réinit." action="#{administrationManagedBean.resetPasswordUser(cp)}" class="btn btn-default" update=":reinitForm" title="Réinitialiser le mot de passe"/></center>
+                                    </pri:column>
+                                </pri:dataTable>
+
+                            </h:form>
+                        </div> 
+
+                        <div class="tab-pane" id="AttribDroit"> 
+                            <br/>
+                            <h:form class="form-horizontal" id="attribDroitForm">                               
+                                <div class="form-group">
+                                    <h:outputText  class="col-sm-2 control-label" value="Choisir l'utilisateur"/>
+                                    <div class="col-sm-10">
+                                        <div class="input-group">
+                                            <h:selectOneMenu id="userProfilId" value="#{administrationManagedBean.utilisateurProfil}"  class="form-control right-border form-focus-white" converter="omnifaces.SelectItemsIndexConverter">
+                                                <f:selectItem itemLabel="Selectionner un utilisateur" itemValue="#{null}" noSelectionOption="true"/>
+                                                <f:selectItems var="user" value="#{administrationManagedBean.utilisateurListeSansAdmin}" itemValue="#{user}" itemLabel="#{user.login}"/>
+                                            </h:selectOneMenu>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-white" type="button" data-toggle="modal" data-target="#SearchUser" style="height: 31px;">
+                                                    <i class="fa fa-search"></i>
+                                                </button>
+                                            </span>     
+                                        </div>
+                                    </div>
+                                </div> 
+
+                                <div class="form-group">
+                                    <h:outputText  class="col-sm-2 control-label" value="Choisir le Profil"/>
+                                    <div class="col-sm-10">
+                                        <h:selectOneMenu id="profUserCombId" value="#{administrationManagedBean.utilisateurProfil.profil}" class="form-control" converter="omnifaces.SelectItemsIndexConverter" >
+                                            <f:selectItem itemLabel="Selectionner un profil" itemValue="#{null}" noSelectionOption="true"/>
+                                            <f:selectItems var="prof" value="#{administrationManagedBean.profilListe}" itemValue="#{prof}" itemLabel="#{prof.nomProf}"/>
+                                        </h:selectOneMenu>
+                                    </div>
+                                </div>
+
+                                <div class="pull-right">
+                                    <h:commandButton  class="btn btn-lg btn-white" value="Annuler" action="#{administrationManagedBean.annulerUtilisateurDroit()}">
+                                        <pri:ajax update="@form"/>
+                                    </h:commandButton>
+                                    <h:commandButton  class="btn btn-lg btn-info" value="Valider" action="#{administrationManagedBean.affectationUtilisateurDroit()}">
+                                        <pri:ajax update="@form,:utilisateurForm:utilisateurDT,:journalForm,:form:growl" process="@form"/>
+                                    </h:commandButton>                                                              
+                                </div>
+
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+
+                                <pri:dataTable id="affectationDT" var="aff" value="#{administrationManagedBean.utilisateurListe}"
+                                               widgetVar="affectationWV"                                 
+                                               paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                               rowsPerPageTemplate="5,10,15"
+                                               emptyMessage="La liste d'affectation est vide" reflow="true" rows="10" paginator="true" >                                
+                                    <pri:column filterBy="#{aff.profil.nomProf}" headerText="Profil" filterMatchMode="exact">
+                                        <f:facet name="filter">
+                                            <h:selectOneMenu onchange="PF('affectationWV').filter()" >
+                                                <f:selectItem itemLabel="Tous" itemValue="#{null}" noSelectionOption="true" />
+                                                <f:selectItems var="prof2" value="#{administrationManagedBean.profilListe}" itemValue="#{prof2.nomProf}" itemLabel="#{prof2.nomProf}"/>
+                                            </h:selectOneMenu>
+                                        </f:facet>
+                                        <h:outputText value="#{aff.profil.nomProf}" />
+                                    </pri:column>                                                                          
+                                    <pri:column filterBy="#{aff.login}" headerText="Nom d'utilisateur" filterMatchMode="exact">                                       
+                                        <h:outputText value="#{aff.login}" />
+                                    </pri:column>                                                             
+                                    <pri:column  headerText="Action">                           
+                                        <center><h:commandButton value="Modifier" action="#{administrationManagedBean.renvoieUtilisateurDroit(aff)}" class="btn btn-turquoise">
+                                                <pri:ajax update="@form"/>
+                                            </h:commandButton></center>
+                                    </pri:column>
+                                </pri:dataTable>
+
+                            </h:form>
+                        </div>
+
+                        <div class="tab-pane" id="EnregDroit"> 
+                            <br/>
+                            <h:form class="form-horizontal" id="droitForm">
+                                <h:inputHidden value="#{administrationManagedBean.profil.idProf}"/>
+                                <div class="form-group">
+                                    <h:outputText  class="col-sm-2 control-label" value="Nom du Profil"/>
+                                    <div class="col-sm-10">
+                                        <h:inputText value="#{administrationManagedBean.profil.nomProf}" class="form-control" />
+                                    </div>
+                                </div>                                                       
+
+                                <div class="form-group">
+                                    <h:outputText  class="col-sm-2 control-label" value="Droits"/>
+                                    <div class="col-sm-10">
+                                        <h:panelGroup layout="block" styleClass="selection">
+                                            <pri:selectManyCheckbox id="grid"  value="#{administrationManagedBean.droitListeSource}" layout="pageDirection" converter="omnifaces.SelectItemsIndexConverter">
+                                                <f:selectItems value="#{administrationManagedBean.droitListe}" var="grp" itemLabel="#{grp.libDroit}" itemValue="#{grp}" />
+                                            </pri:selectManyCheckbox>   
+                                        </h:panelGroup>
+                                    </div>
+                                </div>
+                                <div class="pull-right">
+                                    <h:commandButton  class="btn btn-lg btn-white" value="Annuler" action="#{administrationManagedBean.annulerProfil()}">
+                                        <pri:ajax update="@form"/>
+                                    </h:commandButton>
+                                    <h:commandButton  class="btn btn-lg btn-info" value="Valider" action="#{administrationManagedBean.ajouterProfil()}">
+                                        <pri:ajax update="@form,:attribDroitForm:profUserCombId,:journalForm,:form:growl" process="@form"/>
+                                    </h:commandButton>                                                              
+                                </div>
+
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <pri:dataTable id="profilDT" var="pr" value="#{administrationManagedBean.profilListe}"
+                                               widgetVar="profilWV"                                 
+                                               paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                               rowsPerPageTemplate="5,10,15"
+                                               emptyMessage="La liste de profil est vide" reflow="true" rows="10" paginator="true" >                                
+                                    <pri:column filterBy="#{pr.nomProf}" headerText="Profil" filterMatchMode="contains">        
+                                        <h:outputText value="#{pr.nomProf}" />
+                                    </pri:column>                                                                                 
+                                    <pri:column  headerText="Droit(s)">                           
+                                        <pri:dataList value="#{administrationManagedBean.droitsUtilList(pr)}" var="infodroit" emptyMessage="Aucun droit enregistré">
+                                            #{infodroit.libDroit}
+                                        </pri:dataList>                                          
+                                    </pri:column>  
+                                    <pri:column  headerText="Action">                           
+                                        <center><h:commandButton value="Modifier" action="#{administrationManagedBean.renvoieProfil(pr)}" class="btn btn-turquoise">
+                                                <pri:ajax update="@form"/>
+                                            </h:commandButton></center>
+                                    </pri:column>
+                                </pri:dataTable>
+                            </h:form>
+                        </div>
+
+                        <div class="tab-pane" id="journalTab">
+                            <br/>
+                            <h:form id="journalForm">
+                                <pri:dataTable  var="jr" value="#{journalManagedBean.journalListe}"
+                                                widgetVar="journalWV"                                 
+                                                paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                rowsPerPageTemplate="5,10,15"
+                                                emptyMessage="Le journal est vide" reflow="true" rows="10" paginator="true" >                                
+                                    <pri:column filterBy="#{jr.utilisateur}" headerText="Utilisateur" filterMatchMode="exact"> 
+                                        <f:facet name="filter">
+                                            <h:selectOneMenu onchange="PF('journalWV').filter()" >
+                                                <f:selectItem itemLabel="Tous" itemValue="#{null}" noSelectionOption="true" />
+                                                <f:selectItems var="user3" value="#{administrationManagedBean.utilisateurListe}" itemValue="#{user3.login}" itemLabel="#{user3.login}"/>
+                                            </h:selectOneMenu>
+                                        </f:facet>
+                                        <h:outputText value="#{jr.utilisateur}" />          
+                                    </pri:column>                                                                                 
+                                    <pri:column  headerText="Date" >        
+                                        <h:outputText value="#{jr.dateJourn}" >
+                                            <f:convertDateTime dateStyle="full" locale="fr_FR"/>
+                                        </h:outputText>
+                                    </pri:column>                                                                                 
+                                    <pri:column filterBy="#{jr.heureJourn}" headerText="Heure" filterMatchMode="contains" width="120">                           
+                                        <h:outputText value="#{jr.heureJourn}" />                                       
+                                    </pri:column>  
+                                    <pri:column filterBy="#{jr.levelJourn}" headerText="Level" filterMatchMode="contains" width="120">                           
+                                        <center><h:outputText value="#{jr.levelJourn}" /></center>                                       
+                                    </pri:column>  
+                                    <pri:column filterBy="#{jr.messageJourn}" headerText="Message" filterMatchMode="contains">                           
+                                        <h:outputText value="#{jr.messageJourn}" />                                       
+                                    </pri:column>  
+                                    <pri:column  headerText="Action">                           
+                                        <center><h:commandButton value="Voir" action="#{journalManagedBean.renvoieJournal(jr)}" class="btn btn-turquoise">
+                                                <pri:ajax update=":journalModalForm"/>
+                                            </h:commandButton></center>
+                                    </pri:column>                           
+                                </pri:dataTable>
+                            </h:form>
+                        </div>
+                    </div> 
+                </div> 
+            </div> 
+
+            <div class="modal fade" id="EnregPoste"> 
+                <div class="modal-dialog"> 
+                    <div class="modal-content"> 
+                        <div class="modal-header"> 
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+                            <h4 class="modal-title">Poste</h4> 
+                        </div> 
+                        <div class="modal-body"> 
+                            <h:form class="form-horizontal" id="formTypeMedic">
+                                <h:inputHidden value="#{administrationManagedBean.poste.idLibPoste}"/>
+
+                                <div class="col-md-12">                          
+                                    <div class="form-group">
+                                        <h:outputText  class="control-label" value="Poste *"/>
+                                        <h:inputText id="val" value="#{administrationManagedBean.poste.libPoste}" class="form-control"/>
+                                    </div>
+                                </div>                                             
+
+                                <div class="pull-right"> 
+                                    <h:commandButton  class="btn btn-lg btn-white" value="Effacer" action="#{administrationManagedBean.annulerPoste()}">
+                                        <pri:ajax update="@form"/>
+                                    </h:commandButton>
+                                    <h:commandButton  class="btn btn-lg btn-info"  value="Valider" action="#{administrationManagedBean.ajouterPoste()}">
+                                        <pri:ajax update=":utilisateurForm:posteUserId,:utilisateurForm:utilisateurDT,@form,:form:growl" process="@form"/>
+                                    </h:commandButton>                                                                                                                
+                                </div>                                                                                    
+                                <div class="row"> 
+                                    <div class="col-md-12">
+                                        <br/>
+                                        <pri:dataTable var="pt" value="#{administrationManagedBean.posteListe}"
+                                                       widgetVar="posteWV"                                 
+                                                       paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                       rowsPerPageTemplate="5,10,15"
+                                                       emptyMessage="La liste est vide" reflow="true" rows="10" paginator="true">
+                                            <pri:column headerText="Poste" filterBy="##{pt.libPoste}" filterMatchMode="contains">
+                                                <h:outputText value="#{pt.libPoste}" />
+                                            </pri:column>                                                                                                                                                                                                       
+                                            <pri:column headerText="Action" >
+                                                <center><h:commandButton action="#{administrationManagedBean.renvoiePoste(pt)}" class="btn btn-turquoise" value="Modifier" >
+                                                        <pri:ajax update="@form"/>
+                                                    </h:commandButton></center>
+                                            </pri:column>                           
+                                        </pri:dataTable> 
+                                    </div>                                             
+                                </div>  
+                            </h:form>
+                        </div> 
+                        <div class="modal-footer"> 
+                            &nbsp;  
+                        </div>                            
+                    </div> 
+                </div> 
+            </div>
+
+            <div class="modal fade" id="SearchUser"> 
+                <div class="modal-dialog"> 
+                    <div class="modal-content"> 
+                        <div class="modal-header"> 
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+                            <h4 class="modal-title">Utilisateur</h4> 
+                        </div> 
+                        <div class="modal-body"> 
+                            <h:form class="form-horizontal" id="searchUserForm">                                                                                                                
+                                <div class="row"> 
+                                    <div class="col-md-12">                          
+                                        <pri:dataTable var="search" value="#{administrationManagedBean.utilisateurListe}" selectionMode="single" selection="#{administrationManagedBean.utilisateur2}" rowKey="#{search.id}"
+                                                       widgetVar="searchWV"                                 
+                                                       paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                       rowsPerPageTemplate="5,10,15"
+                                                       emptyMessage="La liste d'utilisateur est vide" reflow="true" rows="10" paginator="true">                
+                                            <pri:ajax event="rowSelect" listener="#{administrationManagedBean.onRowSelect}"  update=":attribDroitForm:userProfilId"/>
+                                            <pri:ajax event="rowUnselect" listener="#{administrationManagedBean.onRowUnselect}"  update=":attribDroitForm:userProfilId"/>
+                                            <pri:column filterBy="#{search.login}" headerText="Nom d'utilisateur" filterMatchMode="contains">
+                                                <h:outputText value="#{search.login}" />
+                                            </pri:column>                                        
+                                        </pri:dataTable> 
+                                    </div>                                             
+                                </div>  
+                            </h:form>
+                        </div> 
+                        <div class="modal-footer"> 
+                            &nbsp;    
+                        </div>                            
+                    </div> 
+                </div> 
+            </div>
+
+            <div class="modal fade" id="InfoReinit"> 
+                <div class="modal-dialog"> 
+                    <div class="modal-content">
+                        <h:form id="reinitForm">
+                            <div class="modal-header"> 
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+                                <h4 class="modal-title">Comfirmation</h4> 
+                            </div> 
+                            <div class="modal-body">
+
+                                <p>
+                                    Voulez vous réinitialiser le mot de passe de : <h:outputText value="#{administrationManagedBean.utilisateurPswd.login}"/> ?
+                                </p> 
+                            </div> 
+                            <div class="modal-footer"> 
+                                <button type="button" class="btn btn-white" data-dismiss="modal">Annuler</button>        
+                                <pri:commandButton  class="btn btn-info" value="Valider" action="#{administrationManagedBean.confirmResetPasswordUser()}" style="height: 32px;"/>  
+                            </div>
+                        </h:form>
+                    </div> 
+                </div> 
+            </div> 
+
+            <div class="modal fade" id="journalModal"> 
+                <div class="modal-dialog"> 
+                    <div class="modal-content"> 
+                        <div class="modal-header"> 
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+                            <h4 class="modal-title">Information journal</h4> 
+                        </div> 
+                        <div class="modal-body">
+                            <h:form class="form-horizontal" id="journalModalForm">
+                                <div class="form-group">
+                                    <h:outputLabel  class="col-sm-3" value="Utilisateur" style="font-weight: bold;"/>
+                                    <h:outputText  value="#{journalManagedBean.journal.utilisateur}" class="col-sm-9" style="font-weight: bold;"/>
+                                </div>                                
+                                <div class="form-group">
+                                    <h:outputLabel  class="col-sm-3" value="Date" style="font-weight: bold;"/>
+                                    <h:outputText  value="#{journalManagedBean.journal.dateJourn}" class="col-sm-9">
+                                        <f:convertDateTime dateStyle="full" locale="fr_FR"/>
+                                    </h:outputText>
+                                </div>                                
+                                <div class="form-group">
+                                    <h:outputLabel  class="col-sm-3" value="Heure" style="font-weight: bold;"/>
+                                    <h:outputText  value="#{journalManagedBean.journal.heureJourn}" class="col-sm-9"/>
+                                </div>                              
+                                <div class="form-group">
+                                    <h:outputLabel  class="col-sm-3" value="Logger" style="font-weight: bold;"/>
+                                    <h:outputText  value="#{journalManagedBean.journal.logger}" class="col-sm-9"/>
+                                </div>                              
+                                <div class="form-group">
+                                    <h:outputLabel  class="col-sm-3" value="Level" style="font-weight: bold;"/>
+                                    <h:outputText  value="#{journalManagedBean.journal.levelJourn}" class="col-sm-9"/>
+                                </div>                             
+                                <div class="form-group">
+                                    <h:outputLabel  class="col-sm-2" value="Message" style="font-weight: bold;"/>
+                                    <h:inputTextarea class="col-sm-10 form-control" rows="10" cols="10" value="#{journalManagedBean.journal.messageJourn}" disabled="true"/>
+                                </div>                             
+                            </h:form>
+                        </div> 
+                        <div class="modal-footer"> 
+                            &nbsp;    
+                        </div>
+                    </div> 
+                </div> 
+            </div> 
+
+
+        </div>
+    </ui:define>
+
+</ui:composition>

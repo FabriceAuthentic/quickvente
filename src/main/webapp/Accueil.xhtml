@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:pri="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="./resources/templates/Common.xhtml">
+
+    <ui:param name="titlePage" value="Accueil"/>
+    <ui:define name="Contents">
+        <div class="page-title"> 
+            <div class="title-env"> 
+                <h1 class="title">Accueil</h1> 
+                <p class="description">Page d'accueil de quickvente</p>
+            </div> 
+            <div class="breadcrumb-env"> 
+                <ol class="breadcrumb bc-1" > 
+                    <li> <a href="#"><i class="fa-home"></i>Home</a> </li> 
+                    <li class="active"> <strong>Accueil</strong> </li> 
+                </ol> 
+            </div> 
+        </div>
+        
+        
+        <div class="page-loading-overlay">
+            <div class="loader-2"></div>
+        </div>
+
+        <div class="row"> 
+            <h:form>
+                <div class="col-lg-6">
+                    <div class="col-sm-6">
+                        <div class="xe-widget xe-vertical-counter xe-vertical-counter-pink"> 
+                            <div class="xe-icon"> <i class="fa fa-tags"></i> </div> 
+                            <div class="xe-label"> <strong class="num">38</strong> <span>Article</span> </div> 
+                        </div> 
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="xe-widget xe-vertical-counter xe-vertical-counter-success"> 
+                            <div class="xe-icon"> <i class="fa fa-cubes"></i> </div> 
+                            <div class="xe-label"> <strong class="num">10</strong> <span>Commande</span> </div> 
+                        </div> 
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="xe-widget xe-vertical-counter xe-vertical-counter-white"> 
+                            <div class="xe-icon"> <i class="fa fa-bank"></i> </div> 
+                            <div class="xe-label"> <strong class="num">5</strong> <span>Magasin</span> </div> 
+                        </div> 
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="xe-widget xe-vertical-counter xe-vertical-counter-turquoise"> 
+                            <div class="xe-icon"> <i class="fa fa-truck"></i> </div> 
+                            <div class="xe-label"> <strong class="num">3</strong> <span>Fournisseurs</span> </div> 
+                        </div> 
+                    </div>
+
+                </div>
+                <div class="col-lg-6">
+                    
+                    <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> 
+                    <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/>
+                    <div class="panel panel-default"> 
+                        <div class="panel-heading">Les actualités...</div> 
+                        <table class="table"> 
+                            <thead> 
+                                <tr>
+                                    <th width="15%">N°</th> 
+                                    <th width="50%">Activités</th> 
+                                    <th width="35%">Chiffres</th> 
+                                </tr> 
+                            </thead> 
+                            <tbody> 
+                                <tr> 
+                                    <td>1</td>
+                                    <td>Sorties</td>
+                                    <td>14</td> 
+                                </tr> 
+                                <tr> 
+                                    <td>2</td>
+                                    <td>Retour</td> 
+                                    <td>3</td> 
+                                </tr> 
+                                <tr> 
+                                    <td>3</td> 
+                                    <td>Article à commander</td>
+                                    <td>8</td> 
+                                </tr> 
+                            </tbody> 
+                        </table> 
+                    </div> 
+                </div>
+            </h:form>
+        </div>  
+    </ui:define>
+
+</ui:composition>
