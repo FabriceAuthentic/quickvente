@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
-import javax.faces.view.ViewScoped;
+import javax.faces.bean.ViewScoped;
 import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
 import org.apache.log4j.Priority;
@@ -43,7 +43,7 @@ import org.primefaces.extensions.util.DateUtils;
  */
 @ManagedBean
 @ViewScoped
-public class EntreeManagedBean implements Serializable{
+public class EntreeManagedBean implements Serializable {
 
     private Stock stock;
     private Produit produit;
@@ -51,26 +51,27 @@ public class EntreeManagedBean implements Serializable{
     private Categorie categorie;
     private StockId stockId;
     private Mtm mtm;
-    
+
     private List<Stock> stockListe;
-    private List<Stock> stockListe2;    
+    private List<Stock> stockListeTest;
+    private List<Stock> stockListe2;
     private List<Produit> produitListe;
     private List<Produit> produitListeSelect;
     private List<Livraison> livraisonListe;
-    private List<Categorie> categotieListe;    
+    private List<Categorie> categotieListe;
 
     @EJB
     private StockSessionBeanLocal stockServices;
-    
+
     @EJB
     private ProduitSessionBeanLocal produitServices;
-    
+
     @EJB
     private LivraisonSessionBeanLocal livraisonServices;
-    
+
     @EJB
     private CategorieSessionBeanLocal categorieServices;
-                    
+
     public EntreeManagedBean() {
         produit = new Produit();
         stock = new Stock();
@@ -78,16 +79,17 @@ public class EntreeManagedBean implements Serializable{
         categorie = new Categorie();
         stockId = new StockId();
         mtm = new Mtm();
-        
+
         produitListe = new ArrayList<>();
         produitListeSelect = new ArrayList<>();
         categotieListe = new ArrayList<>();
         livraisonListe = new ArrayList<>();
         stockListe = new ArrayList<>();
+        stockListeTest = new ArrayList<>();
         stockListe2 = new ArrayList<>();
-        
+
     }
-    
+
     public void checkDroit() {
         if (EntityRealm.getSubject().isPermitted(constante.ROLE_CREER_STOCK_CLE)) {
             RequestContext.getCurrentInstance().execute("jQuery('#entreeModal').modal('show', {backdrop: 'static'});");
@@ -95,17 +97,17 @@ public class EntreeManagedBean implements Serializable{
             Mtm.mikiLog4jMessageError();
         }
     }
-    
+
     @PostConstruct
-    public void init(){
+    public void init() {
         livraison.setDate_liv(new Date());
     }
-    
-    public void gestionCategorie(){
+
+    public void gestionCategorie() {
         UserTransaction tx = TransactionManager.getUserTransaction();
         try {
             tx.begin();
-            if(categorie.getLib_categ().trim().isEmpty()) {
+            if (categorie.getLib_categ().trim().isEmpty()) {
                 mtm.mikiMessageWarn("Veuillez saisir le nom de la catégorie svp !");
             } else {
                 if (categorie.getId_categ() == null) {
@@ -132,29 +134,29 @@ public class EntreeManagedBean implements Serializable{
             }
             mtm.mikiMessageError();
         }
-    }    
+    }
 
     public void renvoiCategorie(Categorie categ) {
         categorie = categ;
     }
-    
+
     public void annulerCategorie() {
         categorie = new Categorie();
     }
 
-    public void gestionProduit() {        
-        if(EntityRealm.getSubject().isPermitted(constante.ROLE_CREER_PRODUIT_CLE) || EntityRealm.getSubject().isPermitted(constante.ROLE_MODIFIER_PRODUIT)) {
+    public void gestionProduit() {
+        if (EntityRealm.getSubject().isPermitted(constante.ROLE_CREER_PRODUIT_CLE) || EntityRealm.getSubject().isPermitted(constante.ROLE_MODIFIER_PRODUIT)) {
             UserTransaction tx = TransactionManager.getUserTransaction();
             try {
                 tx.begin();
-                if(produit.getLib_prod().trim().isEmpty()) {
+                if (produit.getLib_prod().trim().isEmpty()) {
                     mtm.mikiMessageWarn("Veuillez saisir le nom du produit svp !");
-                } else if((produit.getQte_alerte() == 0) || produit.getQte_alerte().toString().trim().isEmpty()) {
+                } else if ((produit.getQte_alerte() == 0) || produit.getQte_alerte().toString().trim().isEmpty()) {
                     mtm.mikiMessageWarn("Veuillez saisir la quantité alerte du produit svp !");
-                } else if(produit.getCategorie() == null) {
+                } else if (produit.getCategorie() == null) {
                     mtm.mikiMessageWarn("Veuillez selectionner la catégorie du produit svp !");
                 } else {
-                    if(produit.getId_prod() == null) {
+                    if (produit.getId_prod() == null) {
                         produit.setDate_creation(new Date());
                         produitServices.saveOne(produit);
                         tx.commit();
@@ -179,72 +181,91 @@ public class EntreeManagedBean implements Serializable{
                 } catch (SystemException ex1) {
                     Logger.getLogger(EntreeManagedBean.class.getName()).log(Level.SEVERE, null, ex1);
                 }
-                mtm.mikiMessageError();                
+                mtm.mikiMessageError();
             }
         } else {
             mtm.mikiLog4jMessageError();
         }
     }
-    
+
     public void renvoieProduit(Produit prod) {
-        if(EntityRealm.getSubject().isPermitted(constante.ROLE_CREER_PRODUIT_CLE) || EntityRealm.getSubject().isPermitted(constante.ROLE_MODIFIER_PRODUIT)) {
-            produit = prod; 
+        if (EntityRealm.getSubject().isPermitted(constante.ROLE_CREER_PRODUIT_CLE) || EntityRealm.getSubject().isPermitted(constante.ROLE_MODIFIER_PRODUIT)) {
+            produit = prod;
         } else {
             mtm.mikiLog4jMessageError();
-        }    
+        }
     }
-    
+
     public void annulerProduit() {
         produit = new Produit();
-    }    
+    }
     
-    public void ajoutProduit(){ 
-        try {     
-            System.out.println("-------------------------");
-            for(Produit prd : produitListeSelect) {
-                stock.setProduit(prd);
-                System.out.println("Taille : "+stockListe.size());
-                if(!stockListe.contains(stock)){
-                    stockListe.add(stock);
+    public void viderStockList(){
+        stockListe = new ArrayList<Stock>();
+    }
+
+    public void ajoutProduit() {
+        try {
+            if (livraison == null) {
+                Mtm.mikiMessageWarnSelectionner("le bon de livraison");
+            } else {
+                System.out.println("-------------------------");
+                for (Produit prd : produitListeSelect) {
+                    StockId stockIdTest = new StockId();
+                    stockIdTest.setId_prod(prd.getId_prod());
+                    stockIdTest.setId_liv(livraison.getId_liv());
+                    stock.setProduit(prd);
+                    stock.setLivraison(livraison);
+                    stock.setId(stockIdTest);
+                    if (!stockListe.contains(stock)) {
+                        stockListe.add(stock);
+                    }
+                    System.out.println("Taille du stockListeTest apres insertion : "+stockListe.size());
+                    stock = new Stock();
+                    stockIdTest = new StockId();
+                    System.out.println("-----+++++++++++++------");
                 }
-                stock = new Stock();
-            }    
+            }
+           
+            System.out.println("");
+            
+
         } catch (Exception e) {
             mtm.mikiMessageError();
         }
     }
-    
+
     public void onCellEdit(CellEditEvent event) {
 
-    }    
-    
-    public void annulerListe(){
+    }
+
+    public void annulerListe() {
         produit = new Produit();
         stock = new Stock();
         livraison = new Livraison();
         stockListe.clear();
     }
-    
-    public void gestionLivraison(){
-        if(EntityRealm.getSubject().isPermitted(constante.ROLE_CREER_STOCK_CLE)){
+
+    public void gestionLivraison() {
+        if (EntityRealm.getSubject().isPermitted(constante.ROLE_CREER_STOCK_CLE)) {
             UserTransaction tx = TransactionManager.getUserTransaction();
             try {
                 tx.begin();
-                if(livraison.getRef_liv().trim().isEmpty()){
+                if (livraison.getRef_liv().trim().isEmpty()) {
                     mtm.mikiMessageWarn("Veuillez renseigner le numéro du bon de livraison svp!");
-                } else if(livraison.getDate_liv() == null){
+                } else if (livraison.getDate_liv() == null) {
                     mtm.mikiMessageWarn("Veuillez renseigner la date de livraison svp!");
                 } else {
-                    if(livraison.getId_liv() == null){
+                    if (livraison.getId_liv() == null) {
                         livraisonServices.saveOne(livraison);
-                        mtm.logMikiLog4j(EntreeManagedBean.class.getName(),org.apache.log4j.Level.INFO, "Enregistrement de livraison : " + livraison.getRef_liv());
+                        mtm.logMikiLog4j(EntreeManagedBean.class.getName(), org.apache.log4j.Level.INFO, "Enregistrement de livraison : " + livraison.getRef_liv());
                         tx.commit();
                         livraison = new Livraison();
                         livraison.setDate_liv(new Date());
                         mtm.mikiMessageInfo();
                     } else {
                         livraisonServices.updateOne(livraison);
-                        mtm.logMikiLog4j(EntreeManagedBean.class.getName(),org.apache.log4j.Level.INFO, "Modification de livraison : " + livraison.getRef_liv());
+                        mtm.logMikiLog4j(EntreeManagedBean.class.getName(), org.apache.log4j.Level.INFO, "Modification de livraison : " + livraison.getRef_liv());
                         tx.commit();
                         livraison = new Livraison();
                         mtm.mikiMessageInfo();
@@ -260,59 +281,54 @@ public class EntreeManagedBean implements Serializable{
                 } catch (SystemException ex1) {
                     Logger.getLogger(EntreeManagedBean.class.getName()).log(Level.SEVERE, null, ex1);
                 }
-                mtm.mikiMessageError();                 
+                mtm.mikiMessageError();
             }
-        }else {
+        } else {
             mtm.mikiLog4jMessageError();
         }
     }
-    
-    public void annulerLivraison(){
+
+    public void annulerLivraison() {
         livraison = new Livraison();
     }
-    
-    public void renvoieLivraison(Livraison liv){
+
+    public void renvoieLivraison(Livraison liv) {
         livraison = liv;
     }
-    
-    public void gestionEntreeStock(){
-        if(EntityRealm.getSubject().isPermitted(constante.ROLE_CONSULTER_STOCK_CLE)){
+
+    public void gestionEntreeStock() {
+        if (EntityRealm.getSubject().isPermitted(constante.ROLE_CONSULTER_STOCK_CLE)) {
             UserTransaction tx = TransactionManager.getUserTransaction();
-            try {                 
-                tx.begin();
-                if(livraison.getId_liv() == null){
+            try {
+                
+                if (livraison.getId_liv() == null) {
                     mtm.mikiMessageWarn("Veuillez selectionnerÒ le numéro du bon de livraison");
-                } else if(stockListe.isEmpty()){
+                } else if (stockListe.isEmpty()) {
                     Mtm.mikiMessageWarn("Veuillez ajouter un produit svp !");
                 } else {
                     boolean test = false;
                     String nomProd = "";
-                    
-                    for(Stock st : stockListe) {
-                        if((st.getQte_stock() == 0) || (st.getQte_stock().toString().trim().isEmpty())){
+                    System.out.println(stockListe);
+                    for (Stock st1 : stockListe) {
+                        if ((st1.getQte_stock() == null) || (st1.getQte_stock() == 0)) {
                             test = true;
-                            nomProd = st.getProduit().getLib_prod();
+                            nomProd = st1.getProduit().getLib_prod();
                             break;
                         }
                     }
-                    if(test) {
+                    if (test) {
                         mtm.mikiMessageErrorPerso("Veuillez revoir la quantité stockée du produit : " + nomProd + " svp !");
                     } else {
-                        for(Stock st : stockListe) {
+                        for (Stock st : stockListe) {
                             tx.begin();
-                            stockId.setId_liv(livraison.getId_liv());
-                            stockId.setId_prod(st.getProduit().getId_prod());
-                            st.setId(stockId);
-                            st.setLivraison(livraison);
-                            st.setProduit(st.getProduit());
                             stockServices.saveOne(st);
                             tx.commit();
                             stock = new Stock();
                         }
-                        mtm.logMikiLog4j(EntreeManagedBean.class.getName(),org.apache.log4j.Level.INFO, "Réception de la livraison : " + livraison.getRef_liv());
+                        mtm.logMikiLog4j(EntreeManagedBean.class.getName(), org.apache.log4j.Level.INFO, "Réception de la livraison : " + livraison.getRef_liv());
                         stockListe = new ArrayList<>();
                         mtm.mikiMessageInfo();
-                    }    
+                    }
                 }
             } catch (Exception e) {
                 try {
@@ -324,25 +340,26 @@ public class EntreeManagedBean implements Serializable{
                 } catch (SystemException ex1) {
                     Logger.getLogger(EntreeManagedBean.class.getName()).log(Level.SEVERE, null, ex1);
                 }
-                Mtm.mikiMessageError();                                                
-            }            
+                e.printStackTrace();
+                Mtm.mikiMessageError();
+            }
         }
     }
 
-    public void supprimerStockListe(Stock stk){
+    public void supprimerStockListe(Stock stk) {
         stockListe.remove(stk);
     }
-    
+
     public boolean filterByDate(Object value, Object filter, Locale locale) {
 
-        if( filter == null ) {
+        if (filter == null) {
             return true;
         }
 
-        if( value == null ) {
+        if (value == null) {
             return false;
         }
-        
+
         return org.apache.commons.lang.time.DateUtils.truncatedEquals((Date) filter, (Date) value, Calendar.DATE);
     }
 
@@ -401,7 +418,7 @@ public class EntreeManagedBean implements Serializable{
     public void setCategorieServices(CategorieSessionBeanLocal categorieServices) {
         this.categorieServices = categorieServices;
     }
-    
+
     public List<Stock> getStockListe() {
         return stockListe;
     }
@@ -409,6 +426,16 @@ public class EntreeManagedBean implements Serializable{
     public void setStockListe(List<Stock> stockListe) {
         this.stockListe = stockListe;
     }
+
+    public List<Stock> getStockListeTest() {
+        return stockListeTest;
+    }
+
+    public void setStockListeTest(List<Stock> stockListeTest) {
+        this.stockListeTest = stockListeTest;
+    }
+    
+    
 
     public Stock getStock() {
         return stock;
@@ -465,8 +492,8 @@ public class EntreeManagedBean implements Serializable{
     public void setStockId(StockId stockId) {
         this.stockId = stockId;
     }
-    
-    public Integer qteDispo(Produit prod){
+
+    public Integer qteDispo(Produit prod) {
         return produitServices.getQuantiteDispo(prod);
     }
 
@@ -477,5 +504,5 @@ public class EntreeManagedBean implements Serializable{
     public void setStockListe2(List<Stock> stockListe2) {
         this.stockListe2 = stockListe2;
     }
-    
+
 }
